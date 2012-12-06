@@ -23,3 +23,9 @@ SUPPORT
 5. Tumblr  (not fully tested)
 
 If you want to collaborate, to improve performance or to add support to another websites, please submit pull requests.
+
+
+REQUIREMENTS
+==
+1. BeautifulSoup 4
+2. Requests
