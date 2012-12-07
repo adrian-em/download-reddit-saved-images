@@ -16,13 +16,13 @@ Items downloaded **will be unsaved**. If you want to prevent this, remove all oc
 Changelog
 ---
 * 0.2.1.1
-* * Improved code thanks to */u/shaggorama*
-* * Now using PRAW and PIL
-* * Added support for Picsarus
+    * Improved code thanks to */u/shaggorama*
+    * Now using PRAW and PIL
+    * Added support for Picsarus
 
 
 * 0.1.1.1
-* * Initial release
+    * Initial release
 
 
 Support
