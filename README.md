@@ -15,6 +15,9 @@ Items downloaded **will be unsaved**. If you want to prevent this, remove all oc
 
 Changelog
 ---
+* 0.2.2.1
+    * Added support for Picasaurus
+    * Show errors to the user
 * 0.2.1.1
     * Improved code thanks to */u/shaggorama*
     * Now using PRAW and PIL
@@ -33,6 +36,7 @@ Support
 4. Flickr images
 5. Tumblr  (not fully tested)
 6. Picsarus
+7. Picasaurus
 
 **If you want to collaborate, to improve performance or to add support to another websites, please submit pull requests.**
 

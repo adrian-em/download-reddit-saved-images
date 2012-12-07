@@ -8,7 +8,7 @@ from StringIO import StringIO
 
 
 __author__ = 'Adrian Espinosa'
-__version__ = '0.2.1.1'
+__version__ = '0.2.2.1'
 __contributor__ = '/u/shaggorama'
 
 image_formats = ['bmp', 'dib', 'eps', 'ps', 'gif', 'im', 'jpg', 'jpe', 'jpeg',
@@ -161,6 +161,21 @@ class Downloader(object):
             errors.append(self.submission.title)
             print e
 
+    def picasaurus_link(self):
+        photo = requests.get(self.submission.url)
+        pic = Soup(photo.content)
+        img = pic.find("img", {"class": "photoQcontent"})
+        url = img.attrs['src']
+        try:
+            photo = requests.get(url)
+            image = Image.open(StringIO(photo.content))
+            image.verify()
+            Image.open(StringIO(photo.content)).save(self.path + "." + image.format.lower())
+            self.submission.unsave()
+        except Exception, e:
+            errors.append(self.submission.title)
+            print e
+
 praw = praw.Reddit("aesptux\'s saved images downloader")
 
 print "Logging in..."
@@ -197,6 +212,13 @@ for link in saved_links:
             d.flickr_link()
         elif 'picsarus' in link.domain:
             d.picsarus_link()
+        elif 'picasaurus' in link.domain:
+            d.picasaurus_link()
         else:
             print "%s ->> Domain not supported" % (link.domain)
 print "Done."
+
+if len(errors) > 0:
+    print "The following items have failed"
+    for err in errors:
+        print err
