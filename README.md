@@ -22,8 +22,6 @@ Changelog
     * Improved code thanks to */u/shaggorama*
     * Now using PRAW and PIL
     * Added support for Picsarus
-
-
 * 0.1.1.1
     * Initial release
 
