@@ -15,6 +15,9 @@ Items downloaded **will be unsaved**. If you want to prevent this, remove all oc
 
 Changelog
 ---
+* 0.2.2.2
+    * Refactor variable names
+    * Fixed bug while unsaving items.
 * 0.2.2.1
     * Added support for Picasaurus
     * Show errors to the user

@@ -1,14 +1,15 @@
 import requests
 import os
-from bs4 import BeautifulSoup as Soup
+from bs4 import BeautifulSoup as bs
 from zipfile import ZipFile
 from PIL import Image
 import praw
 from StringIO import StringIO
+import time
 
 
 __author__ = 'Adrian Espinosa'
-__version__ = '0.2.2.1'
+__version__ = '0.2.2.2'
 __contributor__ = '/u/shaggorama'
 
 image_formats = ['bmp', 'dib', 'eps', 'ps', 'gif', 'im', 'jpg', 'jpe', 'jpeg',
@@ -33,8 +34,14 @@ username = ''
 password = ''
 save_dir = ''
 album_path = os.path.join(save_dir, 'albums')
+
 # to notify errors
 errors = []
+# list to append correct submissions
+# at the end, iterate through the list unsaving them
+# It seems that removing items just after being downloaded
+# causes to fetch just the first page
+correct_submissions = []
 
 
 class Downloader(object):
@@ -48,29 +55,29 @@ class Downloader(object):
 
     def direct_link(self):
         try:
-            photo = requests.get(self.submission.url)
-            image = Image.open(StringIO(photo.content))
-            image.verify()
-            Image.open(StringIO(photo.content)).save(self.path + "." + image.format.lower())
-            self.submission.unsave()
+            response = requests.get(self.submission.url)
+            img = Image.open(StringIO(response.content))
+            img.verify()
+            Image.open(StringIO(response.content)).save(self.path + "." + img.format.lower())
+            correct_submissions.append(self.submission)
         except Exception, e:
             errors.append(self.submission.title)
             print e
 
     def imgur_album(self):
         download_url = 'http://s.imgur.com/a/%s/zip' % (os.path.split(self.submission.url)[1])
-        filezip = requests.get(download_url)
+        response = requests.get(download_url)
         path = os.path.join(album_path, self.submission.title[0:50])
         # extract zip
         if not os.path.exists(path):
             os.mkdir(path)
         try:
             i = open(path + '.zip', 'w')
-            i.write(filezip.content)
+            i.write(response.content)
             i.close()
             zipfile = ZipFile(path + '.zip')
             zipfile.extractall(path)
-            self.submission.unsave()
+            correct_submissions.append(self.submission)
         except Exception, e:  # big album
             os.remove(path + '.zip')
             print e
@@ -80,20 +87,20 @@ class Downloader(object):
             if '#' in idimage:
                 idimage = idimage[0:idimage.index("#")]
             url = "http://imgur.com/a/%s/layout/blog" % (idimage)
-            web = requests.get(url)
-            soup = Soup(web.content)
-            container = soup.find("div", {"id": "image-container"})
-            imgs = container.findAll("a", {"class": "zoom"})
+            response = requests.get(url)
+            soup = bs(response.content)
+            container_element = soup.find("div", {"id": "image-container"})
+            imgs_elements = container_element.findAll("a", {"class": "zoom"})
             counter = 0
-            for img in imgs:
+            for img in imgs_elements:
                 print counter
-                p = img.attrs['href']
+                img_url = img.attrs['href']
                 try:
-                    photo = requests.get(p)
-                    image = Image.open(StringIO(photo.content))
-                    image.verify()
-                    Image.open(StringIO(photo.content)).save(self.path + "." + image.format.lower())
-                    self.submission.unsave()
+                    response = requests.get(img_url)
+                    img = Image.open(StringIO(response.content))
+                    img.verify()
+                    Image.open(StringIO(response.content)).save(self.path + "." + img.format.lower())
+                    correct_submissions.append(self.submission)
                 except Exception, e:
                     errors.append(self.submission.title)
                     print e
@@ -103,88 +110,88 @@ class Downloader(object):
         # image data, I have to write an extension
         new_url = "http://i.imgur.com/%s.jpg" % (os.path.split(self.submission.url)[1])
         try:
-            photo = requests.get(new_url)
-            image = Image.open(StringIO(photo.content))
-            image.verify()
-            Image.open(StringIO(photo.content)).save(self.path + "." + image.format.lower())
-            self.submission.unsave()
+            response = requests.get(new_url)
+            img = Image.open(StringIO(response.content))
+            img.verify()
+            Image.open(StringIO(response.content)).save(self.path + "." + img.format.lower())
+            correct_submissions.append(self.submission)
         except Exception, e:
             errors.append(self.submission.title)
             print e
 
     def tumblr_link(self):
-        photo = requests.get(self.submission.url)
-        soup = Soup(photo.content)
+        response = requests.get(self.submission.url)
+        soup = bs(response.content)
         #div = soup.find("div", {'class': 'post'})
         #if not div:
         #    div = soup.find("li", {'class': 'post'})
-        links = soup.findAll("img")
-        for l in links:
+        img_elements = soup.findAll("img")
+        for l in img_elements:
             if "media.tumblr.com/tumblr_" in l.attrs['src']:
-                url = l.attrs['src']
+                img_url = l.attrs['src']
                 #img = div.find("img")
-                #url = img.attrs["src"]
+                #img_url = img.attrs["src"]
                 try:
-                    photo = requests.get(url)
-                    image = Image.open(StringIO(photo.content))
-                    image.verify()
-                    Image.open(StringIO(photo.content)).save(self.path + "." + image.format.lower())
-                    self.submission.unsave()
+                    response = requests.get(img_url)
+                    img = Image.open(StringIO(response.content))
+                    img.verify()
+                    Image.open(StringIO(response.content)).save(self.path + "." + img.format.lower())
+                    correct_submissions.append(self.submission)
                 except Exception, e:
                     errors.append(self.submission.title)
                     print e
 
     def flickr_link(self):
-        photo = requests.get(self.submission.url)
-        fkr = Soup(photo.content)
-        div = fkr.find("div", {"class": "photo-div"})
-        photo = div.find("img")
-        url = photo.attrs['src']
+        response = requests.get(self.submission.url)
+        soup = bs(response.content)
+        div_element = soup.find("div", {"class": "photo-div"})
+        img_element = div_element.find("img")
+        img_url = img_element.attrs['src']
         try:
-            photo = requests.get(url)
-            image = Image.open(StringIO(photo.content))
+            response = requests.get(img_url)
+            image = Image.open(StringIO(response.content))
             image.verify()
-            Image.open(StringIO(photo.content)).save(self.path + "." + image.format.lower())
-            self.submission.unsave()
+            Image.open(StringIO(response.content)).save(self.path + "." + image.format.lower())
+            correct_submissions.append(self.submission)
         except Exception, e:
             errors.append(self.submission.title)
             print e
 
     def picsarus_link(self):
         try:
-            photo = requests.get(self.submission.url + ".jpg")
-            image = Image.open(StringIO(photo.content))
-            image.verify()
-            Image.open(StringIO(photo.content)).save(self.path + "." + image.format.lower())
-            self.submission.unsave()
+            response = requests.get(self.submission.url + ".jpg")
+            img = Image.open(StringIO(response.content))
+            img.verify()
+            Image.open(StringIO(response.content)).save(self.path + "." + img.format.lower())
+            correct_submissions.append(self.submission)
         except Exception, e:
             errors.append(self.submission.title)
             print e
 
     def picasaurus_link(self):
-        photo = requests.get(self.submission.url)
-        pic = Soup(photo.content)
-        img = pic.find("img", {"class": "photoQcontent"})
-        url = img.attrs['src']
+        rersponse = requests.get(self.submission.url)
+        soup = bs(rersponse.content)
+        img = soup.find("img", {"class": "photoQcontent"})
+        img_url = img.attrs['src']
         try:
-            photo = requests.get(url)
-            image = Image.open(StringIO(photo.content))
+            rersponse = requests.get(img_url)
+            image = Image.open(StringIO(rersponse.content))
             image.verify()
-            Image.open(StringIO(photo.content)).save(self.path + "." + image.format.lower())
-            self.submission.unsave()
+            Image.open(StringIO(rersponse.content)).save(self.path + "." + image.format.lower())
+            correct_submissions.append(self.submission)
         except Exception, e:
             errors.append(self.submission.title)
             print e
 
-praw = praw.Reddit("aesptux\'s saved images downloader")
+r = praw.Reddit("aesptux\'s saved images downloader")
 
 print "Logging in..."
 # create session
-praw.login(username=username, password=password)
+r.login(username=username, password=password)
 print "Logged in."
 print "Getting data..."
 # this returns a generator
-saved_links = praw.get_saved_links(limit=None)
+saved_links = r.get_saved_links(limit=None)
 
 # check if dir exists
 if not os.path.exists(save_dir):
@@ -217,6 +224,12 @@ for link in saved_links:
         else:
             print "%s ->> Domain not supported" % (link.domain)
 print "Done."
+
+# unsave items
+for submission in correct_submissions:
+    print "Unsaving %s" % (submission.title)
+    submission.unsave()
+    time.sleep(2)  # reddit's api restriction
 
 if len(errors) > 0:
     print "The following items have failed"
