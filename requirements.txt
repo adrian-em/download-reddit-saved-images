@@ -1,0 +1,5 @@
+beautifulsoup4==4.1.3
+PIL==1.1.7
+praw==1.0.8
+
+
