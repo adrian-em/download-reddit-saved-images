@@ -15,6 +15,8 @@ Items downloaded **will be unsaved**. If you want to prevent this, remove all oc
 
 Changelog
 ---
+* 0.2.3.0
+    * Little refactor to improve PEP8
 * 0.2.2.2
     * Refactor variable names
     * Fixed bug while unsaving items.
