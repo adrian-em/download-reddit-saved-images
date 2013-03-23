@@ -12,7 +12,7 @@ import time
 
 
 __author__ = 'Adrian Espinosa'
-__version__ = '0.2.3.0'
+__version__ = '1.0.0.0'
 __contributor__ = '/u/shaggorama'
 
 IMAGE_FORMATS = ['bmp', 'dib', 'eps', 'ps', 'gif', 'im', 'jpg', 'jpe', 'jpeg',
@@ -72,7 +72,7 @@ class Downloader(object):
     def __init__(self, submission):
         self.submission = submission
         self.path = os.path.join(SAVE_DIR, str(submission.created) +
-            submission.ttile[0:20])
+            submission.title[0:20].replace("/", "_").replace("\\", "_"))
         self.album_path = os.path.join(self.path, 'albums')
         print "Downloading --> %s" % (submission.title)
 
@@ -285,6 +285,7 @@ for c_submission in CORRECT_SUBMISSIONS:
     time.sleep(2)  # reddit's api restriction
 
 if len(ERRORS) > 0:
-    print "The following items have failed"
+    print "The following items have failed:"
     for err in ERRORS:
         print err
+    print "Perhaps you should check if the images still exist."

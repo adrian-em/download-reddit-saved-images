@@ -15,6 +15,10 @@ Items downloaded **will be unsaved**. If you want to prevent this, remove all oc
 
 Changelog
 ---
+* 1.0.0.0
+    * Version 1.0.0.0! During my tests I did not found any major error
+    * Bug fixes
+    * If the submission.title contained '/' or '\' it failed to save
 * 0.2.3.0
     * Little refactor to improve PEP8
 * 0.2.2.2
