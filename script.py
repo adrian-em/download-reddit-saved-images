@@ -244,7 +244,7 @@ R.login(username=USERNAME, password=PASSWORD)
 print "Logged in."
 print "Getting data..."
 # this returns a generator
-SAVED_LINKS = R.get_saved_links(limit=None)
+SAVED_LINKS = R.user.get_saved(limit=None)
 
 # check if dir exists
 if not os.path.exists(SAVE_DIR):
