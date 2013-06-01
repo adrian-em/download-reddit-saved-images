@@ -15,6 +15,9 @@ Items downloaded **will be unsaved**. If you want to prevent this, remove all oc
 
 Changelog
 ---
+* 1.0.0.1
+    * Update to newest PRAW
+    * Fix bug #2, albums with slashes failed
 * 1.0.0.0
     * Version 1.0.0.0! During my tests I did not found any major error
     * Bug fixes

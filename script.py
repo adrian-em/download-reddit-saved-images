@@ -72,7 +72,7 @@ class Downloader(object):
     def __init__(self, submission):
         self.submission = submission
         self.path = os.path.join(SAVE_DIR, str(submission.created) +
-            submission.title[0:20].replace("/", "_").replace("\\", "_"))
+            submission.title[0:20].replace("/", "").replace("\\", ""))
         self.album_path = os.path.join(self.path, 'albums')
         print "Downloading --> %s" % (submission.title)
 
@@ -98,7 +98,7 @@ class Downloader(object):
         download_url = 'http://s.imgur.com/a/%s/zip' % \
             (os.path.split(self.submission.url)[1])
         response = requests.get(download_url)
-        path = os.path.join(ALBUM_PATH, self.submission.title[0:50])
+        path = os.path.join(ALBUM_PATH, self.submission.title[0:50].replace("/", ""))
         # extract zip
         if not os.path.exists(path):
             os.mkdir(path)
