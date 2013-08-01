@@ -11,10 +11,15 @@ Instructions
 4. Run the script and see how your saved images are downloaded :)
 
 **WARNING:**
-Items downloaded **will be unsaved**. If you want to prevent this, remove all occurrences of unsave()
+Items downloaded **will be unsaved**. If you want to prevent this, remove all occurrences of unsave().
+
 
 Changelog
 ---
+* 0.2.3.0
+	* Fixed error which caused albums to save to the wrong location, on the same photo.
+	* Fixed error requests loop.
+	* Some refactoring.
 * 0.2.2.2
     * Refactor variable names
     * Fixed bug while unsaving items.
@@ -38,6 +43,11 @@ Support
 5. Tumblr  (not fully tested)
 6. Picsarus
 7. Picasaurus
+
+
+
+**Note**: Gifs seems to not work.
+
 
 **If you want to collaborate, to improve performance or to add support to another websites, please submit pull requests.**
 

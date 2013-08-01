@@ -9,12 +9,12 @@ import time
 
 
 __author__ = 'Adrian Espinosa'
-__version__ = '0.2.2.2'
+__version__ = '0.2.3.0'
 __contributor__ = '/u/shaggorama'
 
 image_formats = ['bmp', 'dib', 'eps', 'ps', 'gif', 'im', 'jpg', 'jpe', 'jpeg',
-                  'pcd', 'pcx', 'png', 'pbm', 'pgm', 'ppm', 'psd', 'tif',
-                  'tiff', 'xbm', 'xpm', 'rgb', 'rast', 'svg']
+                 'pcd', 'pcx', 'png', 'pbm', 'pgm', 'ppm', 'psd', 'tif',
+                 'tiff', 'xbm', 'xpm', 'rgb', 'rast', 'svg']
 
 
 def is_image_link(submission):
@@ -46,7 +46,7 @@ def check_size(filename):
 # user data
 username = ''
 password = ''
-save_dir = '/home/aesptux/tests'
+save_dir = '/Users/adrian/Documentos/tests'
 album_path = os.path.join(save_dir, 'albums')
 
 # to notify errors
@@ -63,8 +63,8 @@ class Downloader(object):
 
     def __init__(self, submission):
         self.submission = submission
-        self.path = os.path.join(save_dir, str(submission.created) + \
-            submission.title[0:20])
+        self.path = os.path.join(save_dir, str(submission.created) +
+                                 submission.title[0:20])
         self.album_path = os.path.join(self.path, 'albums')
         print "Downloading --> %s" % (submission.title)
 
@@ -73,8 +73,8 @@ class Downloader(object):
             response = requests.get(self.submission.url)
             img = Image.open(StringIO(response.content))
             img.verify()
-            Image.open(StringIO(response.content)).save(self.path + "." + \
-                img.format.lower())
+            Image.open(StringIO(response.content)).save(self.path + "." +
+                                                        img.format.lower())
             correct_submissions.append(self.submission)
         except Exception, e:
             errors.append(self.submission.title)
@@ -83,7 +83,11 @@ class Downloader(object):
     def imgur_album(self):
         download_url = 'http://s.imgur.com/a/%s/zip' % \
             (os.path.split(self.submission.url)[1])
-        response = requests.get(download_url)
+        try:
+            response = requests.get(download_url)
+        except Exception, e:
+            response = ""
+
         path = os.path.join(album_path, self.submission.title[0:50])
         # extract zip
         if not os.path.exists(path):
@@ -116,12 +120,16 @@ class Downloader(object):
                     response = requests.get(img_url)
                     img = Image.open(StringIO(response.content))
                     img.verify()
-                    Image.open(StringIO(response.content)).save(self.path + \
-                        "." + img.format.lower())
+                    Image.open(StringIO(response.content)).save(path + "/" +
+                                                                str(counter) +
+                                                                "." +
+                                                                img.format
+                                                                .lower())
                     correct_submissions.append(self.submission)
                 except Exception, e:
                     errors.append(self.submission.title)
                     print e
+            counter += 1
 
     def imgur_link(self):
         # just a hack. i dont know if this will be a .jpg, but in order to
@@ -132,8 +140,8 @@ class Downloader(object):
             response = requests.get(new_url)
             img = Image.open(StringIO(response.content))
             img.verify()
-            Image.open(StringIO(response.content)).save(self.path + "." + \
-                img.format.lower())
+            Image.open(StringIO(response.content)).save(self.path + "." +
+                                                        img.format.lower())
             correct_submissions.append(self.submission)
         except Exception, e:
             errors.append(self.submission.title)
@@ -155,8 +163,10 @@ class Downloader(object):
                     response = requests.get(img_url)
                     img = Image.open(StringIO(response.content))
                     img.verify()
-                    Image.open(StringIO(response.content)).save(self.path + \
-                        "." + img.format.lower())
+                    Image.open(StringIO(response.content)).save(self.path +
+                                                                "." +
+                                                                img.format
+                                                                .lower())
                     correct_submissions.append(self.submission)
                 except Exception, e:
                     errors.append(self.submission.title)
@@ -172,8 +182,8 @@ class Downloader(object):
             response = requests.get(img_url)
             image = Image.open(StringIO(response.content))
             image.verify()
-            Image.open(StringIO(response.content)).save(self.path + "." + \
-                image.format.lower())
+            Image.open(StringIO(response.content)).save(self.path + "." +
+                                                        image.format.lower())
             correct_submissions.append(self.submission)
         except Exception, e:
             errors.append(self.submission.title)
@@ -184,8 +194,8 @@ class Downloader(object):
             response = requests.get(self.submission.url + ".jpg")
             img = Image.open(StringIO(response.content))
             img.verify()
-            Image.open(StringIO(response.content)).save(self.path + "." + \
-                img.format.lower())
+            Image.open(StringIO(response.content)).save(self.path + "." +
+                                                        img.format.lower())
             correct_submissions.append(self.submission)
         except Exception, e:
             errors.append(self.submission.title)
@@ -200,8 +210,8 @@ class Downloader(object):
             rersponse = requests.get(img_url)
             image = Image.open(StringIO(rersponse.content))
             image.verify()
-            Image.open(StringIO(rersponse.content)).save(self.path + "." + \
-                image.format.lower())
+            Image.open(StringIO(rersponse.content)).save(self.path + "." +
+                                                         image.format.lower())
             correct_submissions.append(self.submission)
         except Exception, e:
             errors.append(self.submission.title)
