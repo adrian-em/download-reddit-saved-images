@@ -127,7 +127,6 @@ class Downloader(object):
             if '#' in idimage:
                 print "# in idimage"
                 idimage = idimage[0:idimage.index("#")]
-                print idimage
             url = "http://imgur.com/a/%s/layout/blog" % (idimage)
             
             response = requests.get(url)
@@ -144,6 +143,9 @@ class Downloader(object):
                 counter
                 img_url = img.attrs['href']
                 try:
+                    # damn weird links
+                    if img_url.startswith('//'):
+                        img_url = "http:{0}".format(img_url)
                     print "Processing {0}".format(img_url)
                     response = requests.get(img_url)
                     img = Image.open(StringIO(response.content))
