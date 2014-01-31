@@ -6,9 +6,8 @@ This script checks your saved links and searchs for images to automagically down
 Instructions
 ---
 1. Clone the repository
-2. Enter your reddit's username and password
-3. Set a directory where images will be stored
-4. Run the script and see how your saved images are downloaded :)
+2. Open config.yaml and configure your data. Username and password to login, and directory to store images.
+3. Run the script and see how your saved images are downloaded :)
 
 **WARNING:**
 Items downloaded **will be unsaved**. If you want to prevent this, remove all occurrences of unsave().
@@ -16,6 +15,12 @@ Items downloaded **will be unsaved**. If you want to prevent this, remove all oc
 
 Changelog
 ---
+* 1.1.0
+	* Fixed several bugs
+* 1.0.2
+	* Refactoring
+	* Bug fixes
+	* Added support for YAML
 * 0.2.3.0
 	* Fixed error which caused albums to save to the wrong location, on the same photo.
 	* Fixed error requests loop.
@@ -58,3 +63,4 @@ Requirements
 2. Requests
 3. Praw
 4. PIL
+5. PyYAML
