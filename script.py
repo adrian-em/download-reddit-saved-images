@@ -13,7 +13,7 @@ import yaml
 
 
 __author__ = 'Adrian Espinosa'
-__version__ = '1.0.2'
+__version__ = '1.1.0'
 __contributor__ = '/u/shaggorama'
 
 IMAGE_FORMATS = ['bmp', 'dib', 'eps', 'ps', 'gif', 'im', 'jpg', 'jpe', 'jpeg',
@@ -143,6 +143,9 @@ class Downloader(object):
                 counter
                 img_url = img.attrs['href']
                 try:
+                    # damn weird links
+                    if img_url.startswith('//'):
+                        img_url = "http:{0}".format(img_url)
                     print "Processing {0}".format(img_url)
                     response = requests.get(img_url)
                     img = Image.open(StringIO(response.content))
@@ -276,6 +279,9 @@ if not os.path.exists(os.path.join(SAVE_DIR, 'albums')):
     os.mkdir(ALBUM_PATH)
 
 for link in SAVED_LINKS:
+    # delete trailing slash
+    if link.url.endswith('/'):
+        link.url = link.url[0:-1]
     # create object per submission. Trusting garbage collector!
     d = Downloader(link)
 
