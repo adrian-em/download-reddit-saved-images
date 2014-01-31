@@ -9,10 +9,11 @@ from PIL import Image
 import praw
 from StringIO import StringIO
 import time
+import yaml
 
 
 __author__ = 'Adrian Espinosa'
-__version__ = '1.0.0.1'
+__version__ = '1.0.2'
 __contributor__ = '/u/shaggorama'
 
 IMAGE_FORMATS = ['bmp', 'dib', 'eps', 'ps', 'gif', 'im', 'jpg', 'jpe', 'jpeg',
@@ -46,10 +47,12 @@ def check_size(filename):
         return False
 
 
+CONFIG = open('config.yaml')
+CONFIG_DATA = yaml.safe_load(CONFIG)
 # user data
-USERNAME = ''
-PASSWORD = ''
-SAVE_DIR = ''
+USERNAME = CONFIG_DATA['username']
+PASSWORD = CONFIG_DATA['password']
+SAVE_DIR = CONFIG_DATA['save_dir']
 ALBUM_PATH = os.path.join(SAVE_DIR, 'albums')
 
 # to notify ERRORS
