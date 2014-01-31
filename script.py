@@ -127,6 +127,7 @@ class Downloader(object):
             if '#' in idimage:
                 print "# in idimage"
                 idimage = idimage[0:idimage.index("#")]
+                print idimage
             url = "http://imgur.com/a/%s/layout/blog" % (idimage)
             
             response = requests.get(url)
@@ -276,6 +277,9 @@ if not os.path.exists(os.path.join(SAVE_DIR, 'albums')):
     os.mkdir(ALBUM_PATH)
 
 for link in SAVED_LINKS:
+    # delete trailing slash
+    if link.url.endswith('/'):
+        link.url = link.url[0:-1]
     # create object per submission. Trusting garbage collector!
     d = Downloader(link)
 
