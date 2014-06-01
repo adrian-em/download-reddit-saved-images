@@ -15,6 +15,9 @@ Items downloaded **will be unsaved**. If you want to prevent this, remove all oc
 
 Changelog
 ---
+* 1.2.0
+	* Move is_image_link to class
+	* New method to decide download method. Cleaner code.
 * 1.1.0
 	* Fixed several bugs
 * 1.0.2

@@ -13,7 +13,7 @@ import yaml
 
 
 __author__ = 'Adrian Espinosa'
-__version__ = '1.1.0'
+__version__ = '1.2.0'
 __contributor__ = '/u/shaggorama'
 
 IMAGE_FORMATS = ['bmp', 'dib', 'eps', 'ps', 'gif', 'im', 'jpg', 'jpe', 'jpeg',
