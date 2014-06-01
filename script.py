@@ -282,8 +282,8 @@ print("Done.")
 # unsave items
 for c_submission in CORRECT_SUBMISSIONS:
     print("Unsaving %s" % (c_submission.title))
-    #c_submission.unsave()
-    #time.sleep(2)  # reddit's api restriction
+    c_submission.unsave()
+    time.sleep(2)  # reddit's api restriction
 
 if len(ERRORS) > 0:
     print("The following items have failed:")
