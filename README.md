@@ -15,6 +15,9 @@ Items downloaded **will be unsaved**. If you want to prevent this, remove all oc
 
 Changelog
 ---
+* 2.0.0
+	* Refactor code
+	* Python 3 support!
 * 1.2.0
 	* Move is_image_link to class
 	* New method to decide download method. Cleaner code.
