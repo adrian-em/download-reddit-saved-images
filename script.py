@@ -247,6 +247,29 @@ class Downloader(object):
             ERRORS.append(self.submission.title)
             print ex
 
+    def choose_download_method(self):
+
+        if self.is_image_link(self.submission):
+            self.direct_link()
+        else:
+            # not direct, read domain
+            if 'imgur' in self.submission.domain:
+                # check if album
+                if '/a/' in self.submission.url:
+                    self.imgur_album()
+                else:
+                    self.imgur_link()
+            elif 'tumblr' in self.submission.domain:
+                self.tumblr_link()
+            elif 'flickr' in self.submission.domain:
+                self.flickr_link()
+            elif 'picsarus' in self.submission.domain:
+                self.picsarus_link()
+            elif 'picasaurus' in self.submission.domain:
+                self.picasaurus_link()
+            else:
+                print "%s ->> Domain not supported" % (self.submission.domain)
+
 R = praw.Reddit("aesptux\'s saved images downloader")
 
 print "Logging in..."
@@ -268,27 +291,8 @@ for link in SAVED_LINKS:
         link.url = link.url[0:-1]
     # create object per submission. Trusting garbage collector!
     d = Downloader(link)
+    d.choose_download_method()
 
-    if d.is_image_link(link):
-        d.direct_link()
-    else:
-        # not direct, read domain
-        if 'imgur' in link.domain:
-            # check if album
-            if '/a/' in link.url:
-                d.imgur_album()
-            else:
-                d.imgur_link()
-        elif 'tumblr' in link.domain:
-            d.tumblr_link()
-        elif 'flickr' in link.domain:
-            d.flickr_link()
-        elif 'picsarus' in link.domain:
-            d.picsarus_link()
-        elif 'picasaurus' in link.domain:
-            d.picasaurus_link()
-        else:
-            print "%s ->> Domain not supported" % (link.domain)
 print "Done."
 
 # unsave items
