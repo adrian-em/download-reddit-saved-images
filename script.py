@@ -20,33 +20,6 @@ IMAGE_FORMATS = ['bmp', 'dib', 'eps', 'ps', 'gif', 'im', 'jpg', 'jpe', 'jpeg',
                  'pcd', 'pcx', 'png', 'pbm', 'pgm', 'ppm', 'psd', 'tif',
                  'tiff', 'xbm', 'xpm', 'rgb', 'rast', 'svg']
 
-
-def is_image_link(sub):
-    """
-    Takes a praw.Submission object and returns a boolean
-    describing whether or not submission links to an
-    image.
-    """
-    if sub.url.split('.')[-1] in IMAGE_FORMATS:
-        return True
-    else:
-        return False
-
-
-def check_size(filename):
-    """
-    Calculate file size.
-    To check if file is corrupt.
-    """
-    stats = os.stat(filename)
-    filesize = stats.st_size
-    # 2 KB
-    if filesize > 2048:
-        return True
-    else:
-        return False
-
-
 CONFIG = open('config.yaml')
 CONFIG_DATA = yaml.safe_load(CONFIG)
 # user data
@@ -79,6 +52,17 @@ class Downloader(object):
                                  .replace("\\", ""))
         self.album_path = os.path.join(self.path, 'albums')
         print "Downloading --> %s" % (submission.title)
+
+    def is_image_link(self, sub):
+        """
+        Takes a praw.Submission object and returns a boolean
+        describing whether or not submission links to an
+        image.
+        """
+        if sub.url.split('.')[-1] in IMAGE_FORMATS:
+            return True
+        else:
+            return False
 
     def direct_link(self):
         """
@@ -128,7 +112,7 @@ class Downloader(object):
                 print "# in idimage"
                 idimage = idimage[0:idimage.index("#")]
             url = "http://imgur.com/a/%s/layout/blog" % (idimage)
-            
+
             response = requests.get(url)
             soup = bs(response.content)
             container_element = soup.find("div", {"id": "image-container"})
@@ -285,7 +269,7 @@ for link in SAVED_LINKS:
     # create object per submission. Trusting garbage collector!
     d = Downloader(link)
 
-    if is_image_link(link):
+    if d.is_image_link(link):
         d.direct_link()
     else:
         # not direct, read domain
