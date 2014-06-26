@@ -15,6 +15,8 @@ Items downloaded **will be unsaved**. If you want to prevent this, remove all oc
 
 Changelog
 ---
+* 2.0.1
+    * Bug fixes.
 * 2.0.0
 	* Refactor code
 	* Python 3 support!
