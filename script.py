@@ -17,7 +17,7 @@ import yaml
 
 
 __author__ = 'Adrian Espinosa'
-__version__ = '2.0.0'
+__version__ = '2.0.1'
 __contributor__ = '/u/shaggorama'
 
 IMAGE_FORMATS = ['bmp', 'dib', 'eps', 'ps', 'gif', 'im', 'jpg', 'jpe', 'jpeg',
@@ -47,13 +47,13 @@ class Downloader(object):
     Define here all methods to download images from different hosts or
     even direct link to image
     """
-    #global ERRORS
+    # global ERRORS
 
     def __init__(self, submission):
         self.submission = submission
         self.path = os.path.join(SAVE_DIR, str(submission.created) +
                                  submission.title[0:20].replace("/", "")
-                                 .replace("\\", ""))
+                                 .replace("\\", "")).replace('"', "")
         self.album_path = os.path.join(self.path, 'albums')
         print("Downloading --> {0}".format(submission.title))
 
@@ -105,6 +105,7 @@ class Downloader(object):
             response = requests.get(download_url)
         except Exception as e:
             response = ""
+            print(e)
 
         path = os.path.join(ALBUM_PATH, self.submission.title[0:50]
                             .replace("/", ""))
@@ -112,14 +113,18 @@ class Downloader(object):
         if not os.path.exists(path):
             os.mkdir(path)
         try:
-            #i = open(path + '.zip', 'w')
-            #i.write(StringIO(response.content))
-            #i.close()
+            # i = open(path + '.zip', 'w')
+            # i.write(StringIO(response.content))
+            # i.close()
             zipfile = ZipFile(BytesIO(response.content))
             zipfile.extractall(path)
             CORRECT_SUBMISSIONS.append(self.submission)
         except Exception as ex:  # big album
-            os.remove(path + '.zip')
+            try:
+                os.remove(path + '.zip')
+            except OSError as ex:
+                ERRORS.append(self.submission.title)
+                print(ex)
             print("Exception: {0}".format(str(ex)))
             print("Album is too big, downloading images...")
             # this is the best layout
@@ -174,15 +179,15 @@ class Downloader(object):
         """
         response = requests.get(self.submission.url)
         soup = bs(response.content)
-        #div = soup.find("div", {'class': 'post'})
-        #if not div:
-        #    div = soup.find("li", {'class': 'post'})
+        # div = soup.find("div", {'class': 'post'})
+        # if not div:
+        #     div = soup.find("li", {'class': 'post'})
         img_elements = soup.findAll("img")
         for img in img_elements:
             if "media.tumblr.com/tumblr_" in img.attrs['src']:
                 img_url = img.attrs['src']
-                #img = div.find("img")
-                #img_url = img.attrs["src"]
+                # img = div.find("img")
+                # img_url = img.attrs["src"]
                 try:
                     self.download_and_save(img_url)
                 except Exception as ex:
