@@ -15,6 +15,8 @@ Items downloaded **will be unsaved**. If you want to prevent this, remove all oc
 
 Changelog
 ---
+* 2.0.2
+    * Added check for existing files. If the file exists, it will not be downloaded again.
 * 2.0.1
     * Bug fixes.
 * 2.0.0

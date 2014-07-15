@@ -4,6 +4,7 @@ Python script to download saved images from reddit
 from __future__ import print_function
 import requests
 import os
+from glob import glob
 from bs4 import BeautifulSoup as bs
 from zipfile import ZipFile
 from PIL import Image
@@ -17,7 +18,7 @@ import yaml
 
 
 __author__ = 'Adrian Espinosa'
-__version__ = '2.0.1'
+__version__ = '2.0.2'
 __contributor__ = '/u/shaggorama'
 
 IMAGE_FORMATS = ['bmp', 'dib', 'eps', 'ps', 'gif', 'im', 'jpg', 'jpe', 'jpeg',
@@ -68,21 +69,32 @@ class Downloader(object):
         else:
             return False
 
+    def check_if_image_exists(self, path, is_file=True):
+        """
+        Takes a path an checks whether it exists or not.
+        param: is_file: Used to determine if its a full name
+        (/Users/test.txt) or a pattern (/Pics/myphoto*)
+        """
+        return os.path.isfile(path) if is_file else len(glob(path + '*')) >= 1
+
     def download_and_save(self, url, custom_path=None):
         """
         Receives an url.
         Download the image (bytes)
         Store it.
         """
-        response = requests.get(url)
-        img = Image.open(BytesIO(response.content))
-        img.verify()
-        if not custom_path:
-            Image.open(BytesIO(response.content)).save(self.path + "." +
-                                                       img.format.lower())
+        if not self.check_if_image_exists(self.path, is_file=False):
+            response = requests.get(url)
+            img = Image.open(BytesIO(response.content))
+            img.verify()
+            if not custom_path:
+                path = self.path + "." + img.format.lower()
+            else:
+                path = custom_path + "." + img.format.lower()
+            Image.open(BytesIO(response.content)).save(path)
         else:
-            Image.open(BytesIO(response.content)).save(custom_path + "." +
-                                                       img.format.lower())
+            print('%s exists, not saving.' % self.submission.title)
+
         CORRECT_SUBMISSIONS.append(self.submission)
 
     def direct_link(self):
