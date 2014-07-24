@@ -18,7 +18,7 @@ import yaml
 
 
 __author__ = 'Adrian Espinosa'
-__version__ = '2.0.2'
+__version__ = '2.0.3'
 __contributor__ = '/u/shaggorama'
 
 IMAGE_FORMATS = ['bmp', 'dib', 'eps', 'ps', 'gif', 'im', 'jpg', 'jpe', 'jpeg',
@@ -56,7 +56,7 @@ class Downloader(object):
                                  submission.title[0:20].replace("/", "")
                                  .replace("\\", "")).replace('"', "")
         self.album_path = os.path.join(self.path, 'albums')
-        print("Downloading --> {0}".format(submission.title))
+        print("Downloading --> {0}".format(submission.title.encode('utf-8')))
 
     def is_image_link(self, sub):
         """
@@ -137,7 +137,7 @@ class Downloader(object):
             except OSError as ex:
                 ERRORS.append(self.submission.title)
                 print(ex)
-            print("Exception: {0}".format(str(ex)))
+            #print("Exception: {0}".format(str(ex)))
             print("Album is too big, downloading images...")
             # this is the best layout
             idimage = os.path.split(self.submission.url)[1]
