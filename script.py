@@ -53,7 +53,8 @@ class Downloader(object):
     def __init__(self, submission):
         self.submission = submission
         self.path = os.path.join(SAVE_DIR, str(submission.created) +
-                                 submission.title[0:20].replace("/", "")
+                                 submission.title.encode('utf-8')[0:20]
+                                 .replace("/", "")
                                  .replace("\\", "")).replace('"', "")
         self.album_path = os.path.join(self.path, 'albums')
         print("Downloading --> {0}".format(submission.title.encode('utf-8')))
@@ -93,7 +94,8 @@ class Downloader(object):
                 path = custom_path + "." + img.format.lower()
             Image.open(BytesIO(response.content)).save(path)
         else:
-            print('%s exists, not saving.' % self.submission.title)
+            print('%s exists, not saving.' % self.submission.title
+                  .encode('utf-8'))
 
         CORRECT_SUBMISSIONS.append(self.submission)
 
@@ -104,7 +106,7 @@ class Downloader(object):
         try:
             self.download_and_save(self.submission.url)
         except Exception as ex:
-            ERRORS.append(self.submission.title)
+            ERRORS.append(self.submission.title.encode('utf-8'))
             print(ex)
 
     def imgur_album(self):
@@ -119,8 +121,8 @@ class Downloader(object):
             response = ""
             print(e)
 
-        path = os.path.join(ALBUM_PATH, self.submission.title[0:50]
-                            .replace("/", ""))
+        path = os.path.join(ALBUM_PATH, self.submission.title
+                            .encode('utf-8')[0:50].replace("/", ""))
         # extract zip
         if not os.path.exists(path):
             os.mkdir(path)
@@ -135,7 +137,7 @@ class Downloader(object):
             try:
                 os.remove(path + '.zip')
             except OSError as ex:
-                ERRORS.append(self.submission.title)
+                ERRORS.append(self.submission.title.encode('utf-8'))
                 print(ex)
             #print("Exception: {0}".format(str(ex)))
             print("Album is too big, downloading images...")
@@ -153,7 +155,7 @@ class Downloader(object):
                 imgs_elements = container_element.findAll("a",
                                                           {"class": "zoom"})
             except Exception:
-                ERRORS.append(self.submission.title)
+                ERRORS.append(self.submission.title.encode('utf-8'))
                 return 1
             counter = 0
             for img in imgs_elements:
@@ -167,7 +169,7 @@ class Downloader(object):
                     self.download_and_save(img_url, custom_path=path +
                                            "/" + str(counter))
                 except Exception as ex:
-                    ERRORS.append(self.submission.title)
+                    ERRORS.append(self.submission.title.encode('utf-8'))
                     print("Exception: {0}".format(str(ex)))
                 counter += 1
 
@@ -182,7 +184,7 @@ class Downloader(object):
         try:
             self.download_and_save(new_url)
         except Exception as ex:
-            ERRORS.append(self.submission.title)
+            ERRORS.append(self.submission.title.encode('utf-8'))
             print(ex)
 
     def tumblr_link(self):
@@ -203,7 +205,7 @@ class Downloader(object):
                 try:
                     self.download_and_save(img_url)
                 except Exception as ex:
-                    ERRORS.append(self.submission.title)
+                    ERRORS.append(self.submission.title.encode('utf-8'))
                     print(ex)
 
     def flickr_link(self):
@@ -218,7 +220,7 @@ class Downloader(object):
         try:
             self.download_and_save(img_url)
         except Exception as ex:
-            ERRORS.append(self.submission.title)
+            ERRORS.append(self.submission.title.encode('utf-8'))
             print(ex)
 
     def picsarus_link(self):
@@ -228,7 +230,7 @@ class Downloader(object):
         try:
             self.download_and_save(self.submission.url + ".jpg")
         except Exception as ex:
-            ERRORS.append(self.submission.title)
+            ERRORS.append(self.submission.title.encode('utf-8'))
             print(ex)
 
     def picasaurus_link(self):
@@ -243,7 +245,7 @@ class Downloader(object):
             self.download_and_save(img_url)
             CORRECT_SUBMISSIONS.append(self.submission)
         except Exception as ex:
-            ERRORS.append(self.submission.title)
+            ERRORS.append(self.submission.title.encode('utf-8'))
             print(ex)
 
     def choose_download_method(self):
@@ -298,7 +300,7 @@ print("Done.")
 
 # unsave items
 for c_submission in CORRECT_SUBMISSIONS:
-    print("Unsaving %s" % (c_submission.title))
+    print("Unsaving %s" % (c_submission.title.encode('utf-8')))
     c_submission.unsave()
     time.sleep(2)  # reddit's api restriction
 
