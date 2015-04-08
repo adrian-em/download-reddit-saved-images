@@ -126,8 +126,8 @@ class Downloader(object):
             response = ""
             print(e)
 
-        path = os.path.join(ALBUM_PATH, self.submission.title
-                            .encode('utf-8')[0:50].replace("/", ""))
+        path = os.path.join(ALBUM_PATH, str(self.submission.title
+                            .encode('utf-8')[0:50]).replace("/", ""))
         # extract zip
         if not os.path.exists(path):
             os.mkdir(path)

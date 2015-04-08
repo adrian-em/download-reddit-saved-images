@@ -1,3 +1,4 @@
 *.pyc
 *.ropeproject/*
 *.bak
+config.yaml
