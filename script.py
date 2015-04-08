@@ -179,7 +179,6 @@ class Downloader(object):
                 counter += 1
 
     def imgur_link(self):
-        print(os.path.split(self.submission.url))
         """
         Image from imgur
         """
