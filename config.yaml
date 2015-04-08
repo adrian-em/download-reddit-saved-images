@@ -2,3 +2,4 @@ username: your_username
 password: your_password
 save_dir: your_dir
 # save_dir example: /Users/adrian/reddit_imgs
+unsave: false

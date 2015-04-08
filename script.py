@@ -9,6 +9,9 @@ from bs4 import BeautifulSoup as bs
 from zipfile import ZipFile
 from PIL import Image
 import praw
+import mimetypes
+import html5lib
+
 try:
     from io import BytesIO
 except ImportError:
@@ -16,14 +19,15 @@ except ImportError:
 import time
 import yaml
 
+import urllib
 
 __author__ = 'Adrian Espinosa'
-__version__ = '2.0.3'
-__contributor__ = '/u/shaggorama'
+__version__ = '2.0.4'
+__contributor__ = '/u/shaggorama /u/ppleasure'
 
 IMAGE_FORMATS = ['bmp', 'dib', 'eps', 'ps', 'gif', 'im', 'jpg', 'jpe', 'jpeg',
                  'pcd', 'pcx', 'png', 'pbm', 'pgm', 'ppm', 'psd', 'tif',
-                 'tiff', 'xbm', 'xpm', 'rgb', 'rast', 'svg']
+                 'tiff', 'xbm', 'xpm', 'rgb', 'rast', 'svg', 'gifv', 'webm']
 
 CONFIG = open('config.yaml')
 CONFIG_DATA = yaml.safe_load(CONFIG)
@@ -31,8 +35,8 @@ CONFIG_DATA = yaml.safe_load(CONFIG)
 USERNAME = CONFIG_DATA['username']
 PASSWORD = CONFIG_DATA['password']
 SAVE_DIR = CONFIG_DATA['save_dir']
+UNSAVE = CONFIG_DATA['unsave']
 ALBUM_PATH = os.path.join(SAVE_DIR, 'albums')
-
 # to notify ERRORS
 ERRORS = []
 # list to append correct submissions
@@ -53,7 +57,7 @@ class Downloader(object):
     def __init__(self, submission):
         self.submission = submission
         self.path = os.path.join(SAVE_DIR, str(submission.created) +
-                                 submission.title.encode('utf-8')[0:20]
+                                 str(submission.title.encode('utf-8')[0:20])
                                  .replace("/", "")
                                  .replace("\\", "")).replace('"', "")
         self.album_path = os.path.join(self.path, 'albums')
@@ -84,15 +88,18 @@ class Downloader(object):
         Download the image (bytes)
         Store it.
         """
-        if not self.check_if_image_exists(self.path, is_file=False):
-            response = requests.get(url)
-            img = Image.open(BytesIO(response.content))
-            img.verify()
+        check_path = custom_path if custom_path else self.path
+        if not self.check_if_image_exists(check_path, is_file=False):
+            conn = urllib.request.urlopen(url)
+            cont_type = conn.info()["Content-Type"]
+            ext = mimetypes.guess_extension(cont_type)
             if not custom_path:
-                path = self.path + "." + img.format.lower()
+                path = self.path + "." + ext
             else:
-                path = custom_path + "." + img.format.lower()
-            Image.open(BytesIO(response.content)).save(path)
+                path = custom_path + "." + ext
+            output = open(path, 'wb')
+            output.write(conn.read())
+            output.close()
         else:
             print('%s exists, not saving.' % self.submission.title
                   .encode('utf-8'))
@@ -121,8 +128,8 @@ class Downloader(object):
             response = ""
             print(e)
 
-        path = os.path.join(ALBUM_PATH, self.submission.title
-                            .encode('utf-8')[0:50].replace("/", ""))
+        path = os.path.join(ALBUM_PATH, str(self.submission.title
+                            .encode('utf-8')[0:50]).replace("/", ""))
         # extract zip
         if not os.path.exists(path):
             os.mkdir(path)
@@ -179,7 +186,7 @@ class Downloader(object):
         """
         # just a hack. i dont know if this will be a .jpg, but in order to
         # download an image data, I have to write an extension
-        new_url = "http://i.imgur.com/%s.jpg" % \
+        new_url = "http://imgur.com/download/%s" % \
             (os.path.split(self.submission.url)[1])
         try:
             self.download_and_save(new_url)
@@ -247,6 +254,19 @@ class Downloader(object):
         except Exception as ex:
             ERRORS.append(self.submission.title.encode('utf-8'))
             print(ex)
+    
+    def gfycat_link(self):
+        """
+        Gfycat image link
+        """
+        try:
+            response = requests.get(self.submission.url)
+            soup = bs(response.content, 'html5lib')
+            url = soup.find(id="webmsource").attrs['src']
+            self.download_and_save('http:'+url)
+        except Exception as ex:
+            ERRORS.append(self.submission.title.encode('utf-8'))
+            print(ex)
 
     def choose_download_method(self):
         """
@@ -270,6 +290,8 @@ class Downloader(object):
                 self.picsarus_link()
             elif 'picasaurus' in self.submission.domain:
                 self.picasaurus_link()
+            elif 'gfycat' in self.submission.domain:
+                self.gfycat_link()
             else:
                 print("%s ->> Domain not supported" % (self.submission.domain))
 
@@ -289,6 +311,8 @@ if not os.path.exists(os.path.join(SAVE_DIR, 'albums')):
     os.mkdir(ALBUM_PATH)
 
 for link in SAVED_LINKS:
+    if not hasattr(link, 'url'):
+        continue
     # delete trailing slash
     if link.url.endswith('/'):
         link.url = link.url[0:-1]
@@ -299,10 +323,11 @@ for link in SAVED_LINKS:
 print("Done.")
 
 # unsave items
-for c_submission in CORRECT_SUBMISSIONS:
-    print("Unsaving %s" % (c_submission.title.encode('utf-8')))
-    c_submission.unsave()
-    time.sleep(2)  # reddit's api restriction
+if UNSAVE:
+    for c_submission in CORRECT_SUBMISSIONS:
+        print("Unsaving %s" % (c_submission.title.encode('utf-8')))
+        c_submission.unsave()
+        time.sleep(2)  # reddit's api restriction
 
 if len(ERRORS) > 0:
     print("The following items have failed:")

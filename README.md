@@ -15,6 +15,11 @@ Items downloaded **will be unsaved**. If you want to prevent this, remove all oc
 
 Changelog
 ---
+* 2.0.4
+    * Changed download mechanism to guess extension on basis of content type
+    * Fixed GIF bug
+    * Added support for Gfycat
+    * Fixed compatiblity issue with Python 3
 * 2.0.3
     * Fixed bug with encodings in print()
 * 2.0.2
@@ -53,18 +58,14 @@ Changelog
 
 Support
 ---
-1. Direct links to images
+1. Direct links to images and webm
 2. Imgur links
 3. Imgur albums
 4. Flickr images
 5. Tumblr  (not fully tested)
 6. Picsarus
 7. Picasaurus
-
-
-
-**Note**: Gifs seems to not work.
-
+8. Gfycat
 
 **If you want to collaborate, to improve performance or to add support to another websites, please submit pull requests.**
 
@@ -76,3 +77,4 @@ Requirements
 3. Praw
 4. PIL
 5. PyYAML
+6. HTML5Lib
