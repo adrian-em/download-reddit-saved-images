@@ -34,8 +34,8 @@ CONFIG_DATA = yaml.safe_load(CONFIG)
 USERNAME = CONFIG_DATA['username']
 PASSWORD = CONFIG_DATA['password']
 SAVE_DIR = CONFIG_DATA['save_dir']
+UNSAVE = CONFIG_DATA['unsave']
 ALBUM_PATH = os.path.join(SAVE_DIR, 'albums')
-
 # to notify ERRORS
 ERRORS = []
 # list to append correct submissions
@@ -320,10 +320,11 @@ for link in SAVED_LINKS:
 print("Done.")
 
 # unsave items
-for c_submission in CORRECT_SUBMISSIONS:
-    print("Unsaving %s" % (c_submission.title.encode('utf-8')))
-    c_submission.unsave()
-    time.sleep(2)  # reddit's api restriction
+if UNSAVE:
+    for c_submission in CORRECT_SUBMISSIONS:
+        print("Unsaving %s" % (c_submission.title.encode('utf-8')))
+        c_submission.unsave()
+        time.sleep(2)  # reddit's api restriction
 
 if len(ERRORS) > 0:
     print("The following items have failed:")
