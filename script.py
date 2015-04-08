@@ -10,6 +10,7 @@ from zipfile import ZipFile
 from PIL import Image
 import praw
 import mimetypes
+import html5lib
 
 try:
     from io import BytesIO
@@ -87,7 +88,8 @@ class Downloader(object):
         Download the image (bytes)
         Store it.
         """
-        if not self.check_if_image_exists(self.path, is_file=False):
+        check_path = custom_path if custom_path else self.path
+        if not self.check_if_image_exists(check_path, is_file=False):
             conn = urllib.request.urlopen(url)
             cont_type = conn.info()["Content-Type"]
             ext = mimetypes.guess_extension(cont_type)
@@ -258,8 +260,10 @@ class Downloader(object):
         Gfycat image link
         """
         try:
-            new_url = self.submission.url.replace('gfycat','giant.gfycat') + '.webm'
-            self.download_and_save(new_url)
+            response = requests.get(self.submission.url)
+            soup = bs(response.content, 'html5lib')
+            url = soup.find(id="webmsource").attrs['src']
+            self.download_and_save('http:'+url)
         except Exception as ex:
             ERRORS.append(self.submission.title.encode('utf-8'))
             print(ex)

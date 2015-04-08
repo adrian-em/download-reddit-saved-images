@@ -77,3 +77,4 @@ Requirements
 3. Praw
 4. PIL
 5. PyYAML
+6. HTML5Lib
